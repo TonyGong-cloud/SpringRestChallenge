@@ -16,28 +16,56 @@ import java.util.List;
  */
 
 public class SearchSvcImpl implements SearchSvcInterface {
+    @Autowired
+    ApplicationContext applicContex;
+    
+    List<Item> its;
+    ObjectMapper oma = new ObjectMapper();
+    
+    
     @Override
-    public void init(String itemPriceJsonFileName) {
-
+    public void init(String itPJFileName) {
+try {
+            File jF = applicContex.getResource(itPJFileName).getFile();
+            init(jF);
+        } catch (JsonParseException e) {
+            e.printStackTrace();
+        } catch (JsonMappingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
-    public void init(File itemPriceJsonFile) {
-
+    public void init(File itPJFileName) {
+try{
+            items = oma.readValue(itPJFileName, new TypeReference<List<Item>>(){});
+        }catch(JsonParseException e) {
+            e.printStackTrace();
+        }catch(JsonMappingException e){
+            e.printStackTrace();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
     }
 
     @Override
     public List<Item> getItems() {
-        return null;
+        return its;
     }
 
     @Override
     public List<Item> getItems(String category) {
-        return null;
+        List<Item> res = new ArrayList<>();
+        items.forEach(ele -> res.add(ele));
+        return res.stream().filter(e -> category.equals(getSubstring(e))).collect(Collectors.toList());
     }
 
     @Override
     public List<Item> getItem(String itemShortName) {
-        return null;
+        List<Item> result = new ArrayList<>();
+        items.forEach( ele -> res.add(ele));
+        return res.stream().filter(ele->itemShortName.equals(ele.getShort_name())).collect(Collectors.toList());
     }
 }
